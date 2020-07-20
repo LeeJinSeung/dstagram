@@ -8,11 +8,11 @@ import javax.persistence.Column;
 @Getter
 @Setter
 public class User {
-    public String getUid() {
+    public int getUid() {
         return uid;
     }
 
-    public void setUid(String uid) {
+    public void setUid(int uid) {
         this.uid = uid;
     }
 
@@ -49,7 +49,7 @@ public class User {
     }
 
     @Column
-    private String uid;
+    private int uid;
 
     @Column
     private String email;

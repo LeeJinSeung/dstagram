@@ -1,8 +1,9 @@
 DROP TABLE user IF EXISTS;
 DROP TABLE post IF EXISTS;
+DROP TABLE image IF EXISTS;
 
 create table user (
-    uid varchar(255).
+    uid int,
     email varchar(255) not null,
     name varchar(255),
     nickname varchar(255) not null,
@@ -12,7 +13,7 @@ create table user (
 
 create table post (
     pid int,
-    uid varchar(255).
+    uid int,
     contents varchar(255),
     created timestamp,
     updated timestamp,
@@ -21,7 +22,7 @@ create table post (
 )
 
 create table image (
-    iid int,
+    iid int auto_increment,
     pid int,
     imageUrl varchar(255),
     primary key (iid),

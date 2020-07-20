@@ -1,4 +1,4 @@
-package com.landvibe.dstagram.controller;
+package com.landvibe.dstagram.account;
 
 
 import com.landvibe.dstagram.model.Account;
@@ -14,7 +14,7 @@ public class AccountController {
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public String login(@RequestBody Account account) {
-
+        // db에 있으면 token 생성 후 return, 없으면 null
         return "";
     }
 }

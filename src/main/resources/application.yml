@@ -3,7 +3,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/dstagram?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: root
-    password: landvibe
+    password: cse3207
   jpa:
     database: mysql
     generate-ddl: true
