@@ -1,36 +1,32 @@
 package com.landvibe.dstagram.post;
 
 import com.landvibe.dstagram.model.Post;
+import com.landvibe.dstagram.model.PostDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RestController
 @RequestMapping("/posts")
 public class PostController {
-
     private PostService postService;
 
-    public PostController() {
+    public PostController(PostService postService) {
+        this.postService = postService;
     }
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public List<Post> getPosts() {
+    public List<PostDTO> getPosts() {
         return this.postService.getPosts();
     }
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public Post createPost(@RequestBody Post post) {
-        return this.postService.createPost(post);
+    public void createPost(@RequestBody PostDTO postDTO) {
+        this.postService.createPost(postDTO);
     }
 
     @PutMapping("/{id}")
@@ -47,7 +43,7 @@ public class PostController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Post getOnePost(@PathVariable int id) {
-        return this.postService.getOnePost(id);
+    public PostDTO getPost(@PathVariable int id) {
+        return this.postService.getPost(id);
     }
 }

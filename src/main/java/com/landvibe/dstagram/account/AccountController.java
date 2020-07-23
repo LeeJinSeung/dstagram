@@ -2,6 +2,7 @@ package com.landvibe.dstagram.account;
 
 
 import com.landvibe.dstagram.model.Account;
+import com.landvibe.dstagram.user.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -11,10 +12,16 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/login")
 public class AccountController {
+
+    private AccountService accountService;
+
+    public AccountController(AccountService accountService) {
+        this.accountService = accountService;
+    }
+
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public String login(@RequestBody Account account) {
-        // db에 있으면 token 생성 후 return, 없으면 null
-        return "";
+        return this.accountService.login(account);
     }
 }

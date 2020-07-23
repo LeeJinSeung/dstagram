@@ -6,24 +6,19 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "user")
+@Table(name = "image")
 @Getter
 @Setter
-public class User {
+public class Image {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false, nullable = false)
-    private int uid;
+    private int iid;
 
     @Column
-    private String email;
+    private int pid;
 
     @Column
-    private String name;
-
-    @Column
-    private String nickname;
-
-    @Column
-    private String password;
+    private String imageUrl;
 }
