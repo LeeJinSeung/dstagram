@@ -1,11 +1,10 @@
-package com.landvibe.dstagram.user;
+package com.landvibe.dstagram.controller;
 
 import com.landvibe.dstagram.model.User;
+import com.landvibe.dstagram.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import javax.annotation.Resource;
 
 @Slf4j
 @RestController

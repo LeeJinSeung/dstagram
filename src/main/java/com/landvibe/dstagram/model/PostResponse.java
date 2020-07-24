@@ -8,8 +8,9 @@ import java.util.List;
 
 @Getter
 @Setter
-public class PostDTO {
+public class PostResponse {
     private int pid;
+    private int uid;
     private String contents;
     private List<String> imageUrl;
     private LocalDateTime created;

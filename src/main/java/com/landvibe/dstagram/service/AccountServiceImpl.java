@@ -1,8 +1,9 @@
-package com.landvibe.dstagram.account;
+package com.landvibe.dstagram.service;
 
 import com.landvibe.dstagram.model.Account;
 import com.landvibe.dstagram.model.User;
-import com.landvibe.dstagram.user.UserRepository;
+import com.landvibe.dstagram.repository.UserRepository;
+import com.landvibe.dstagram.service.AccountService;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -1,4 +1,4 @@
-package com.landvibe.dstagram.user;
+package com.landvibe.dstagram.service;
 
 import com.landvibe.dstagram.model.User;
 

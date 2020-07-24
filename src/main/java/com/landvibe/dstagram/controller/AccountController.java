@@ -1,8 +1,8 @@
-package com.landvibe.dstagram.account;
+package com.landvibe.dstagram.controller;
 
 
 import com.landvibe.dstagram.model.Account;
-import com.landvibe.dstagram.user.UserService;
+import com.landvibe.dstagram.service.AccountService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

@@ -18,6 +18,9 @@ public class Post {
     private int pid;
 
     @Column
+    private int uid;
+
+    @Column
     private String contents;
 
     @Column
@@ -29,8 +32,9 @@ public class Post {
     public Post() {
     }
 
-    public Post(int pid, String contents, LocalDateTime created, LocalDateTime updated) {
+    public Post(int pid, int uid, String contents, LocalDateTime created, LocalDateTime updated) {
         this.pid = pid;
+        this.uid = uid;
         this.contents = contents;
         this.created = created;
         this.updated = updated;

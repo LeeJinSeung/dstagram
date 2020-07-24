@@ -1,14 +1,14 @@
-package com.landvibe.dstagram.post;
+package com.landvibe.dstagram.service;
 
-import com.landvibe.dstagram.image.ImageRepository;
+import com.landvibe.dstagram.repository.PostRepository;
+import com.landvibe.dstagram.repository.ImageRepository;
 import com.landvibe.dstagram.model.Image;
 import com.landvibe.dstagram.model.Post;
-import com.landvibe.dstagram.model.PostDTO;
+import com.landvibe.dstagram.model.PostResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PostServiceImpl implements PostService {
@@ -21,10 +21,10 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDTO> getPosts() {
-        List<PostDTO> list = new ArrayList<>();
+    public List<PostResponse> getPosts(int skip, int limit) {
+        List<PostResponse> list = new ArrayList<>();
         List<Post> result = this.postRepository.findAll();
-        for(int i=0;i<result.size();i++) {
+        for(int i=skip * limit;i<result.size() && i<skip*limit+limit;i++) {
             List<Image> imageList = this.imageRepository.findByPid(result.get(i).getPid());
             List<String> strList = new ArrayList<>();
             System.out.println("imagelist size: " + imageList.size());
@@ -32,30 +32,32 @@ public class PostServiceImpl implements PostService {
                 strList.add(imageList.get(j).getImageUrl());
                 System.out.println("imagelist" + j + " " + imageList.get(j).getImageUrl());
             }
-            PostDTO postDTO = new PostDTO();
-            postDTO.setImageUrl(strList);
-            postDTO.setContents(result.get(i).getContents());
-            postDTO.setCreated(result.get(i).getCreated());
-            postDTO.setPid(result.get(i).getPid());
-            postDTO.setUpdated(result.get(i).getUpdated());
-            list.add(postDTO);
+            PostResponse postResponse = new PostResponse();
+            postResponse.setUid(result.get(i).getUid());
+            postResponse.setImageUrl(strList);
+            postResponse.setContents(result.get(i).getContents());
+            postResponse.setCreated(result.get(i).getCreated());
+            postResponse.setPid(result.get(i).getPid());
+            postResponse.setUpdated(result.get(i).getUpdated());
+            list.add(postResponse);
         }
         return list;
     }
 
     @Override
-    public void createPost(PostDTO postDTO) {
+    public void createPost(PostResponse postResponse) {
         Post post = new Post();
-        post.setContents(postDTO.getContents());
+        post.setContents(postResponse.getContents());
+        post.setUid(postResponse.getUid());
         if (this.postRepository.findById(post.getPid()).isPresent()) {
             throw new RuntimeException("This post already exists: " + post.getPid());
         } else {
             this.postRepository.save(post);
 
-            for(int i = 0; i< postDTO.getImageUrl().size(); i++) {
+            for(int i = 0; i< postResponse.getImageUrl().size(); i++) {
                 Image image = new Image();
                 image.setPid(post.getPid());
-                image.setImageUrl(postDTO.getImageUrl().get(i));
+                image.setImageUrl(postResponse.getImageUrl().get(i));
                 this.imageRepository.save(image);
             }
         }
@@ -82,22 +84,23 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDTO getPost(int id) {
+    public PostResponse getPost(int id) {
         if(this.postRepository.findById(id).isPresent()) {
-            PostDTO postDTO = new PostDTO();
+            PostResponse postResponse = new PostResponse();
             Post result = this.postRepository.findById(id).get();
             List<Image> imageList = this.imageRepository.findByPid(id);
             List<String> strList = new ArrayList<>();
             for(int i=0;i<imageList.size();i++) {
                 strList.add(imageList.get(i).getImageUrl());
             }
-            postDTO.setImageUrl(strList);
-            postDTO.setContents(result.getContents());
-            postDTO.setCreated(result.getCreated());
-            postDTO.setPid(result.getPid());
-            postDTO.setUpdated(result.getUpdated());
+            postResponse.setUid(result.getUid());
+            postResponse.setImageUrl(strList);
+            postResponse.setContents(result.getContents());
+            postResponse.setCreated(result.getCreated());
+            postResponse.setPid(result.getPid());
+            postResponse.setUpdated(result.getUpdated());
 
-            return postDTO;
+            return postResponse;
         }
         else {
             throw new RuntimeException("Not found post: " + id);
