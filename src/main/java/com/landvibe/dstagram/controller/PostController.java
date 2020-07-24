@@ -20,7 +20,7 @@ public class PostController {
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public List<PostResponse> getPosts(@RequestBody int skip, @RequestBody int limit) {
+    public List<PostResponse> getPosts(@RequestParam int skip, @RequestParam int limit) {
         return this.postService.getPosts(skip, limit);
     }
 
@@ -38,7 +38,7 @@ public class PostController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deletePost(@PathVariable int id) {
+    public void deletePost(@RequestHeader String token, @PathVariable int id) {
         this.postService.deletePost(id);
     }
 

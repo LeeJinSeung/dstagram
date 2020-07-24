@@ -24,6 +24,7 @@ public class PostServiceImpl implements PostService {
     public List<PostResponse> getPosts(int skip, int limit) {
         List<PostResponse> list = new ArrayList<>();
         List<Post> result = this.postRepository.findAll();
+        System.out.println(skip + " " + limit);
         for(int i=skip * limit;i<result.size() && i<skip*limit+limit;i++) {
             List<Image> imageList = this.imageRepository.findByPid(result.get(i).getPid());
             List<String> strList = new ArrayList<>();
@@ -76,7 +77,8 @@ public class PostServiceImpl implements PostService {
     @Override
     public void deletePost(int id) {
         if (this.postRepository.findById(id).isPresent()) {
-            this.imageRepository.deleteByPid(id);
+            System.out.println("id is exist: " + id);
+            this.imageRepository.deleteAllByPid(id);
             this.postRepository.deleteById(id);
         } else {
             throw new RuntimeException("Not found post: " + id);
