@@ -1,15 +1,11 @@
 package com.landvibe.dstagram.service;
 
-import com.landvibe.dstagram.jwt.JwtUtil;
 import com.landvibe.dstagram.repository.UserRepository;
 import com.landvibe.dstagram.model.Profile;
 import com.landvibe.dstagram.model.User;
-import com.landvibe.dstagram.service.UserService;
-import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.naming.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -17,31 +13,28 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Autowired
-    private JwtUtil jwtUtil;
+    final PasswordEncoder encode;
 
-    public UserServiceImpl(UserRepository userRepository) {
+
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder encode) {
         this.userRepository = userRepository;
-    }
-
-    private void verifyDuplicatedUser(String email) {
-        if (userRepository.findByEmail(email) != null)
-            throw new RuntimeException("This ID is already exist.");
+        this.encode = encode;
     }
 
     @Override
     public User createUser(User user) {
-        System.out.println(user.getEmail());
-        verifyDuplicatedUser(user.getEmail());
-        System.out.println("create user");
-
-        user.setToken(jwtUtil.createToken());
-        return this.userRepository.save(user);
+        if (!this.userRepository.findByEmail(user.getEmail()).isPresent()) {
+            // user.setPassword(encode.encode(user.getPassword()));
+            return this.userRepository.save(user);
+        }
+        else
+            return null;
     }
 
     @Override
     public void deleteUser(User user) {
         // token을 이용하여 삭제하는 방식으로 변경해야함.
-        if (this.userRepository.findByEmail(user.getEmail()) != null) {
+        if (this.userRepository.findByEmail(user.getEmail()).isPresent()) {
             this.userRepository.deleteByEmail(user.getEmail());
         } else {
             throw new RuntimeException("Not found post: " + user.getUid());
