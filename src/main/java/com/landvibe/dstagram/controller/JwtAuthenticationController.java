@@ -1,5 +1,6 @@
 package com.landvibe.dstagram.controller;
 
+import com.landvibe.dstagram.config.JwtAuthenticationProvider;
 import com.landvibe.dstagram.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class JwtAuthenticationController {
 
     @Autowired
-    private AuthenticationProvider authenticationProvider;
+    private JwtAuthenticationProvider authenticationProvider;
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
@@ -45,24 +46,9 @@ public class JwtAuthenticationController {
         return ResponseEntity.ok(new JwtResponse(token));
     }
 
-//    @PostMapping("/login")
-//    public ResponseEntity<?> createAuthenticationToken(@RequestBody Account account) throws Exception {
-//        User user = userRepository.findByEmail(account.getEmail())
-//                .orElseThrow(() -> new RuntimeException("Email does not exist: " + account.getEmail()));
-//        System.out.println("account: " + account.getEmail() + " " + account.getPassword());
-//        System.out.println("user: " + user.getEmail() + " " + user.getPassword());
-//        if(!user.getPassword().equals(account.getPassword())) {
-//            System.out.println("different");
-//            throw new RuntimeException("Wrong password");
-//        }
-//        final UserDetails userDetails = userDetailService.loadUserByUsername(account.getEmail());
-//        final String token = jwtTokenUtil.generateToken(userDetails);
-//
-//        return ResponseEntity.ok(new com.landvibe.dstagram.controller.JwtResponse(token));
-//    }
-
     private void authenticate(String username, String password) throws Exception {
         try {
+            authenticationProvider.setEncoder(passwordEncoder);
             authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(username,password));
         } catch (DisabledException e) {
             throw new Exception("USER_DISABLED", e);
@@ -80,14 +66,11 @@ class JwtRequest {
 
     private String email;
     private String password;
-
 }
 
 @Data
 @AllArgsConstructor
 class JwtResponse {
-
     private String token;
-
 }
 

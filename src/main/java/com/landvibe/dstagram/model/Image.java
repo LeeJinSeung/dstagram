@@ -21,4 +21,6 @@ public class Image {
 
     @Column
     private String imageUrl;
+
+
 }

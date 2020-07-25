@@ -15,4 +15,6 @@ public class Profile {
     private List<Integer> pid;
     private List<String> imageUrl;
     private int count;
+
+
 }

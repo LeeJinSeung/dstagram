@@ -5,6 +5,7 @@ import com.landvibe.dstagram.repository.ImageRepository;
 import com.landvibe.dstagram.model.Image;
 import com.landvibe.dstagram.model.Post;
 import com.landvibe.dstagram.model.PostResponse;
+import io.swagger.annotations.Authorization;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

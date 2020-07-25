@@ -15,4 +15,11 @@ public class PostResponse {
     private List<String> imageUrl;
     private LocalDateTime created;
     private LocalDateTime updated;
+
+    public int getPid() {
+
+        return pid;
+    }
+
+
 }

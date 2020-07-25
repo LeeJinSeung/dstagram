@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User createUser(User user) {
         if (!this.userRepository.findByEmail(user.getEmail()).isPresent()) {
-            // user.setPassword(encode.encode(user.getPassword()));
+            user.setPassword(encode.encode(user.getPassword()));
             return this.userRepository.save(user);
         }
         else

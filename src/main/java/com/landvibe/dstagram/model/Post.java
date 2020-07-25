@@ -39,4 +39,6 @@ public class Post {
         this.created = created;
         this.updated = updated;
     }
+
+
 }
