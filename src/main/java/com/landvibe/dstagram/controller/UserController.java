@@ -1,5 +1,6 @@
 package com.landvibe.dstagram.controller;
 
+import com.landvibe.dstagram.model.Profile;
 import com.landvibe.dstagram.model.User;
 import com.landvibe.dstagram.repository.UserRepository;
 import com.landvibe.dstagram.service.UserService;
@@ -38,7 +39,7 @@ public class UserController {
 
     @GetMapping("/{nickname}")
     @ResponseStatus(HttpStatus.OK)
-    public User getProfile(@PathVariable String nickname) {
+    public Profile getProfile(@PathVariable String nickname) {
         return this.userService.getProfile(nickname);
     }
 }

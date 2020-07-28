@@ -6,8 +6,10 @@ import com.landvibe.dstagram.model.Image;
 import com.landvibe.dstagram.model.Post;
 import com.landvibe.dstagram.model.PostResponse;
 import io.swagger.annotations.Authorization;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,20 +29,16 @@ public class PostServiceImpl implements PostService {
         List<Post> result = this.postRepository.findAll();
         System.out.println(skip + " " + limit);
         for(int i=skip * limit;i<result.size() && i<skip*limit+limit;i++) {
-            List<Image> imageList = this.imageRepository.findByPid(result.get(i).getPid());
+            int finalI = i;
+            List<Image> imageList = this.imageRepository.findByPid(result.get(i).getPid())
+                    .orElseThrow(() -> new UsernameNotFoundException(Integer.toString(result.get(finalI).getPid())));
             List<String> strList = new ArrayList<>();
             System.out.println("imagelist size: " + imageList.size());
             for(int j=0;j<imageList.size();j++) {
                 strList.add(imageList.get(j).getImageUrl());
                 System.out.println("imagelist" + j + " " + imageList.get(j).getImageUrl());
             }
-            PostResponse postResponse = new PostResponse();
-            postResponse.setUid(result.get(i).getUid());
-            postResponse.setImageUrl(strList);
-            postResponse.setContents(result.get(i).getContents());
-            postResponse.setCreated(result.get(i).getCreated());
-            postResponse.setPid(result.get(i).getPid());
-            postResponse.setUpdated(result.get(i).getUpdated());
+            PostResponse postResponse = new PostResponse(result.get(i), strList);
             list.add(postResponse);
         }
         return list;
@@ -51,6 +49,7 @@ public class PostServiceImpl implements PostService {
         Post post = new Post();
         post.setContents(postResponse.getContents());
         post.setUid(postResponse.getUid());
+        System.out.println("post id: " + post.getPid());
         if (this.postRepository.findById(post.getPid()).isPresent()) {
             throw new RuntimeException("This post already exists: " + post.getPid());
         } else {
@@ -66,13 +65,26 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post updatePost(int id, Post post) {
-        if (this.postRepository.findById(id).isPresent()) {
-            post.setPid(id);
-            return this.postRepository.save(post);
-        } else {
-            throw new RuntimeException("Not found post: " + id);
+    public PostResponse updatePost(int id, Post post) {
+        Post p = this.postRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("post does not exist"));
+
+        p.setUpdated(LocalDateTime.now());
+        p.setContents(post.getContents());
+        this.postRepository.save(p);
+
+        List<Image> images = this.imageRepository.findByPid(p.getPid())
+                .orElseThrow(() -> new UsernameNotFoundException("image does not exist"));
+
+        List<String> imageUrl = new ArrayList<>();
+
+        for(int i=0;i<images.size();i++) {
+            imageUrl.add(images.get(i).getImageUrl());
         }
+
+        PostResponse postResponse = new PostResponse(p, imageUrl);
+        return postResponse;
+
     }
 
     @Override
@@ -89,20 +101,15 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostResponse getPost(int id) {
         if(this.postRepository.findById(id).isPresent()) {
-            PostResponse postResponse = new PostResponse();
+
             Post result = this.postRepository.findById(id).get();
-            List<Image> imageList = this.imageRepository.findByPid(id);
+            List<Image> imageList = this.imageRepository.findByPid(id)
+                    .orElseThrow(() -> new UsernameNotFoundException(Integer.toString(id)));;
             List<String> strList = new ArrayList<>();
             for(int i=0;i<imageList.size();i++) {
                 strList.add(imageList.get(i).getImageUrl());
             }
-            postResponse.setUid(result.getUid());
-            postResponse.setImageUrl(strList);
-            postResponse.setContents(result.getContents());
-            postResponse.setCreated(result.getCreated());
-            postResponse.setPid(result.getPid());
-            postResponse.setUpdated(result.getUpdated());
-
+            PostResponse postResponse = new PostResponse(result, strList);
             return postResponse;
         }
         else {

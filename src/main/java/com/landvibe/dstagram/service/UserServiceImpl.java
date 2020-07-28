@@ -1,16 +1,27 @@
 package com.landvibe.dstagram.service;
 
+import com.landvibe.dstagram.model.*;
+import com.landvibe.dstagram.repository.ImageRepository;
+import com.landvibe.dstagram.repository.PostRepository;
 import com.landvibe.dstagram.repository.UserRepository;
-import com.landvibe.dstagram.model.Profile;
-import com.landvibe.dstagram.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PostRepository postRepository;
+
+    @Autowired
+    private ImageRepository imageRepository;
 
     @Autowired
     final PasswordEncoder encode;
@@ -42,20 +53,31 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getProfile(String nickname) {
-        User user = this.userRepository.findByNickname(nickname);
-        if(user == null) {
-            // 존재하지 않는 user일 경우
-            // throw new NotFoundException("Not found user: " + nickname);
-            return null;
-        }
-        else {
-            Profile profile = new Profile();
-            profile.setEmail(user.getEmail());
-            profile.setName(user.getName());
-            profile.setNickname(user.getNickname());
+    public Profile getProfile(String nickname) {
+        User user = this.userRepository.findByNickname(nickname)
+                .orElseThrow(() -> new UsernameNotFoundException(nickname));
 
-            return user;
+        List<Post> posts = this.postRepository.findByUid(user.getUid())
+                .orElseThrow(() -> new UsernameNotFoundException(Integer.toString(user.getUid())));
+
+        List<Integer> pid = new ArrayList<>();
+        List<String> imageUrl = new ArrayList<>();
+
+        for(int i=0;i<posts.size();i++) {
+            int finalI = i;
+            List<Image> imageList = this.imageRepository.findByPid(posts.get(i).getPid())
+                    .orElseThrow(() -> new UsernameNotFoundException(Integer.toString(posts.get(finalI).getPid())));
+
+            pid.add(posts.get(i).getPid());
+            imageUrl.add(imageList.get(0).getImageUrl());
         }
+
+
+        Profile profile = new Profile(user, pid, imageUrl);
+
+        return profile;
+
     }
+
+
 }

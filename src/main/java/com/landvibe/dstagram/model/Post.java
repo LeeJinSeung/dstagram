@@ -30,6 +30,8 @@ public class Post {
     private LocalDateTime updated;
 
     public Post() {
+        this.created = LocalDateTime.now();
+        this.updated = LocalDateTime.now();
     }
 
     public Post(int pid, int uid, String contents, LocalDateTime created, LocalDateTime updated) {
@@ -39,6 +41,4 @@ public class Post {
         this.created = created;
         this.updated = updated;
     }
-
-
 }

@@ -32,7 +32,7 @@ public class PostController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Post updatePost(@PathVariable int id, @RequestBody Post post) {
+    public PostResponse updatePost(@PathVariable int id, @RequestBody Post post) {
         return this.postService.updatePost(id, post);
     }
 

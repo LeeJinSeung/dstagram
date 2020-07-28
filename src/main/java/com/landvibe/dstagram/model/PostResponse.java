@@ -16,10 +16,16 @@ public class PostResponse {
     private LocalDateTime created;
     private LocalDateTime updated;
 
-    public int getPid() {
+    public PostResponse() {
 
-        return pid;
     }
 
-
+    public PostResponse(Post post, List<String> imageUrl) {
+        this.pid = post.getPid();
+        this.uid = post.getUid();
+        this.contents = post.getContents();
+        this.created = post.getCreated();
+        this.updated = post.getUpdated();
+        this.imageUrl = imageUrl;
+    }
 }

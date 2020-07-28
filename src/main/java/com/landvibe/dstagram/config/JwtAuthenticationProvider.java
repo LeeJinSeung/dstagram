@@ -31,14 +31,9 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         String email = authentication.getName();
         String password = authentication.getCredentials().toString();
 
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException(email));
 
-//        if(!user.getPassword().equals(password)) {
-//            throw new RuntimeException("UnAuthorized");
-//        }
-
-        System.out.println(encoder.encode(password));
-        System.out.println(user.getPassword());
         if(!encoder.matches(password, user.getPassword())) {
             throw new RuntimeException("UnAuthorized");
         }

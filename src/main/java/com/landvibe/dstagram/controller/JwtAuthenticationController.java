@@ -1,12 +1,11 @@
 package com.landvibe.dstagram.controller;
 
 import com.landvibe.dstagram.config.JwtAuthenticationProvider;
+import com.landvibe.dstagram.model.JwtRequest;
+import com.landvibe.dstagram.model.JwtResponse;
 import com.landvibe.dstagram.repository.UserRepository;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import com.landvibe.dstagram.config.JwtTokenUtil;
 import com.landvibe.dstagram.service.JwtUserDetailsService;
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
@@ -58,19 +57,5 @@ public class JwtAuthenticationController {
     }
 
 
-}
-
-@Data
-@Getter
-class JwtRequest {
-
-    private String email;
-    private String password;
-}
-
-@Data
-@AllArgsConstructor
-class JwtResponse {
-    private String token;
 }
 

@@ -10,7 +10,7 @@ public interface PostService {
 
     void createPost(PostResponse postResponse);
 
-    Post updatePost(int id, Post post);
+    PostResponse updatePost(int id, Post post);
 
     void deletePost(int id);
 

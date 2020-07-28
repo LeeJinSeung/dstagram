@@ -1,11 +1,14 @@
 package com.landvibe.dstagram.config;
 
+import com.landvibe.dstagram.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import javax.xml.bind.DatatypeConverter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -59,5 +62,24 @@ public class JwtTokenUtil {
         final String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
+
+    private Map<String, Object> createClaims(User user) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("uid", user.getUid());
+        claims.put("nickname", user.getNickname());
+        // Claims.put("nickname", user.getNickname());
+        return claims;
+    }
+
+    public String getUserIdFromToken(String token) throws MalformedJwtException {
+        Claims clames = getAllClaimsFromToken(token);
+        return (String) clames.get("uid");
+    }
+
+    public String getNicknameFromToken(String token) throws MalformedJwtException {
+        Claims clames = getAllClaimsFromToken(token);
+        return (String) clames.get("nickname");
+    }
+
 
 }
