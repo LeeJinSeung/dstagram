@@ -13,7 +13,6 @@ import java.nio.file.AccessDeniedException;
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
-
     @ExceptionHandler(ResourceNotFoundException.class)
     protected ResponseEntity<ExceptionResponse> handleResourceNotFoundException(ResourceNotFoundException e) {
         log.error("handleResourceNotFoundException", e);
@@ -41,6 +40,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     protected ResponseEntity<ExceptionResponse> handleAccessDeniedException(AccessDeniedException e) {
         log.error("handleAccessDeniedException", e);
+        final ExceptionResponse response = new ExceptionResponse();
+        response.setMessage(e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    protected ResponseEntity<ExceptionResponse> handleForbiddenException(ForbiddenException e) {
+        log.error("handleForbiddenException", e);
         final ExceptionResponse response = new ExceptionResponse();
         response.setMessage(e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
