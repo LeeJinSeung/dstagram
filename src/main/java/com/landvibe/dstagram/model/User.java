@@ -6,7 +6,7 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "user")
+@Table
 @Getter
 @Setter
 public class User {
@@ -15,13 +15,13 @@ public class User {
     @Column(updatable = false, nullable = false)
     private int uid;
 
-    @Column
+    @Column(nullable = false)
     private String email;
 
     @Column
     private String name;
 
-    @Column
+    @Column(nullable = false)
     private String nickname;
 
     @Column

@@ -6,6 +6,7 @@ import com.landvibe.dstagram.repository.UserRepository;
 import com.landvibe.dstagram.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,19 +28,20 @@ public class UserController {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public User createUser(@RequestBody User user) {
+    public User createUser(@RequestBody User user) throws Exception {
         return this.userService.createUser(user);
     }
 
     @DeleteMapping("")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUser(@RequestBody User user) {
-        this.userService.deleteUser(user);
+    public void deleteUser(@RequestHeader(value = HttpHeaders.AUTHORIZATION) String token) throws Exception {
+        String tokenValue = token.replace("Bearer ", "").trim();
+        this.userService.deleteUser(tokenValue);
     }
 
     @GetMapping("/{nickname}")
     @ResponseStatus(HttpStatus.OK)
-    public Profile getProfile(@PathVariable String nickname) {
+    public Profile getProfile(@PathVariable String nickname) throws Exception {
         return this.userService.getProfile(nickname);
     }
 }

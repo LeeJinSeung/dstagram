@@ -1,5 +1,6 @@
 package com.landvibe.dstagram.config;
 
+import com.landvibe.dstagram.model.SecurityUser;
 import com.landvibe.dstagram.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -8,7 +9,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import javax.xml.bind.DatatypeConverter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,43 +43,38 @@ public class JwtTokenUtil {
         return getClaimFromToken(token, Claims::getExpiration);
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(SecurityUser securityUser) {
         Map<String, Object> claims = new HashMap<>();
-        return doGenerateToken(claims, userDetails.getUsername());
+        claims.put("uid", securityUser.getUid());
+        claims.put("nickname", securityUser.getNickname());
+        return doGenerateToken(claims, securityUser);
     }
 
-    private String doGenerateToken(Map<String, Object> claims, String username) {
+    private String doGenerateToken(Map<String, Object> claims, SecurityUser securityUser) {
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(username)
+                .setSubject(securityUser.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
+    public Boolean validateToken(String token, SecurityUser securityUser) {
         final String username = getUsernameFromToken(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        return (username.equals(securityUser.getUsername())) && !isTokenExpired(token);
     }
 
-    private Map<String, Object> createClaims(User user) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("uid", user.getUid());
-        claims.put("nickname", user.getNickname());
-        // Claims.put("nickname", user.getNickname());
-        return claims;
+    public int getUserIdFromToken(String token) throws MalformedJwtException {
+        Claims claims = getAllClaimsFromToken(token);
+        System.out.println(claims.toString());
+        System.out.println(claims.get("uid"));
+        return (int) claims.get("uid");
     }
 
-    public String getUserIdFromToken(String token) throws MalformedJwtException {
-        Claims clames = getAllClaimsFromToken(token);
-        return (String) clames.get("uid");
+    public String getUserNicknameFromToken(String token) throws MalformedJwtException {
+        Claims claims = getAllClaimsFromToken(token);
+        return (String) claims.get("nickname");
     }
-
-    public String getNicknameFromToken(String token) throws MalformedJwtException {
-        Claims clames = getAllClaimsFromToken(token);
-        return (String) clames.get("nickname");
-    }
-
 
 }

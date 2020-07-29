@@ -1,11 +1,13 @@
 package com.landvibe.dstagram.service;
 
+import com.landvibe.dstagram.config.JwtTokenUtil;
+import com.landvibe.dstagram.exception.ResourceConflictException;
+import com.landvibe.dstagram.exception.ParameterNotFoundException;
 import com.landvibe.dstagram.model.*;
 import com.landvibe.dstagram.repository.ImageRepository;
 import com.landvibe.dstagram.repository.PostRepository;
 import com.landvibe.dstagram.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -24,6 +26,9 @@ public class UserServiceImpl implements UserService {
     private ImageRepository imageRepository;
 
     @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
     final PasswordEncoder encode;
 
 
@@ -33,49 +38,59 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User createUser(User user) {
-        if (!this.userRepository.findByEmail(user.getEmail()).isPresent()) {
+    public User createUser(User user) throws Exception {
+        if (this.userRepository.findByEmail(user.getEmail()).isPresent() && this.userRepository.findByNickname(user.getNickname()).isPresent()) {
+            throw new ResourceConflictException("Duplicate email and nickname");
+        }
+        else if(this.userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new ResourceConflictException("Duplicate email");
+        }
+        else if(this.userRepository.findByNickname(user.getNickname()).isPresent()) {
+            throw new ResourceConflictException("Duplicate nickname");
+        }
+        else {
             user.setPassword(encode.encode(user.getPassword()));
             return this.userRepository.save(user);
         }
-        else
-            return null;
     }
 
     @Override
-    public void deleteUser(User user) {
-        // token을 이용하여 삭제하는 방식으로 변경해야함.
-        if (this.userRepository.findByEmail(user.getEmail()).isPresent()) {
-            this.userRepository.deleteByEmail(user.getEmail());
+    public void deleteUser(String token) throws Exception {
+        int uid = jwtTokenUtil.getUserIdFromToken(token);
+
+        if (this.userRepository.findById(uid).isPresent()) {
+            this.userRepository.deleteById(uid);
+            List<Post> posts = this.postRepository.findByUid(uid)
+                    .orElse(new ArrayList<>());
+            for(int i=0;i<posts.size();i++) {
+                this.imageRepository.deleteAllByPid(posts.get(i).getPid());
+            }
+            this.postRepository.deleteAllByUid(uid);
         } else {
-            throw new RuntimeException("Not found post: " + user.getUid());
+            throw new RuntimeException("Not found post: " + uid);
         }
     }
 
     @Override
-    public Profile getProfile(String nickname) {
+    public Profile getProfile(String nickname) throws Exception {
         User user = this.userRepository.findByNickname(nickname)
-                .orElseThrow(() -> new UsernameNotFoundException(nickname));
+                .orElseThrow(() -> new ParameterNotFoundException("Not Found"));
 
         List<Post> posts = this.postRepository.findByUid(user.getUid())
-                .orElseThrow(() -> new UsernameNotFoundException(Integer.toString(user.getUid())));
+                .orElse(new ArrayList<>());
 
         List<Integer> pid = new ArrayList<>();
         List<String> imageUrl = new ArrayList<>();
 
         for(int i=0;i<posts.size();i++) {
-            int finalI = i;
             List<Image> imageList = this.imageRepository.findByPid(posts.get(i).getPid())
-                    .orElseThrow(() -> new UsernameNotFoundException(Integer.toString(posts.get(finalI).getPid())));
+                    .orElse(new ArrayList<>());
 
             pid.add(posts.get(i).getPid());
             imageUrl.add(imageList.get(0).getImageUrl());
         }
 
-
-        Profile profile = new Profile(user, pid, imageUrl);
-
-        return profile;
+        return new Profile(user, pid, imageUrl);
 
     }
 

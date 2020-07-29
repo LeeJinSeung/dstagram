@@ -20,7 +20,7 @@ public class Post {
     @Column
     private int uid;
 
-    @Column
+    @Column(nullable = false)
     private String contents;
 
     @Column

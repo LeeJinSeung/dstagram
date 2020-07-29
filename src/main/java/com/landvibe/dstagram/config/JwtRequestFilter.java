@@ -1,11 +1,13 @@
 package com.landvibe.dstagram.config;
 
+import com.landvibe.dstagram.model.SecurityUser;
 import io.jsonwebtoken.ExpiredJwtException;
 import com.landvibe.dstagram.service.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -34,11 +36,19 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         String username = null;
         String jwtToken = null;
+        int uid = 0;
+        String nickname = null;
 
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-            jwtToken = requestTokenHeader.substring(7);
+            jwtToken = requestTokenHeader.replace("Bearer ", "").trim();
             try {
                 username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+                System.out.println("email : " + username);
+                uid = jwtTokenUtil.getUserIdFromToken(jwtToken);
+                System.out.println("uid : " + uid);
+                nickname = jwtTokenUtil.getUserNicknameFromToken(jwtToken);
+                System.out.println("nickname : " + nickname);
+
             } catch (IllegalArgumentException e) {
                 // token이 유효하지 않음
                 System.out.println("Unable to get JWT Token");
@@ -51,11 +61,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
 
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.jwtUserDetailService.loadUserByUsername(username);
+            SecurityUser securityUser = this.jwtUserDetailService.loadUserByEmail(username);
 
-            if(jwtTokenUtil.validateToken(jwtToken, userDetails)) {
+            if(jwtTokenUtil.validateToken(jwtToken, securityUser)) {
                 UsernamePasswordAuthenticationToken authenticationToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null ,userDetails.getAuthorities());
+                        new UsernamePasswordAuthenticationToken(securityUser, null ,securityUser.getAuthorities());
 
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
