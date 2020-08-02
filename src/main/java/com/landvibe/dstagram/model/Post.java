@@ -20,7 +20,7 @@ public class Post {
     @Column
     private int uid;
 
-    @Column
+    @Column(nullable = false)
     private String contents;
 
     @Column
@@ -30,6 +30,8 @@ public class Post {
     private LocalDateTime updated;
 
     public Post() {
+        this.created = LocalDateTime.now();
+        this.updated = LocalDateTime.now();
     }
 
     public Post(int pid, int uid, String contents, LocalDateTime created, LocalDateTime updated) {

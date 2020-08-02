@@ -15,4 +15,17 @@ public class PostResponse {
     private List<String> imageUrl;
     private LocalDateTime created;
     private LocalDateTime updated;
+
+    public PostResponse() {
+
+    }
+
+    public PostResponse(Post post, List<String> imageUrl) {
+        this.pid = post.getPid();
+        this.uid = post.getUid();
+        this.contents = post.getContents();
+        this.created = post.getCreated();
+        this.updated = post.getUpdated();
+        this.imageUrl = imageUrl;
+    }
 }

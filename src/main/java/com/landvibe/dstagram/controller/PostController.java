@@ -3,7 +3,10 @@ package com.landvibe.dstagram.controller;
 import com.landvibe.dstagram.model.Post;
 import com.landvibe.dstagram.model.PostResponse;
 import com.landvibe.dstagram.service.PostService;
+import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.implementation.bind.annotation.Default;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -20,26 +23,29 @@ public class PostController {
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public List<PostResponse> getPosts(@RequestBody int skip, @RequestBody int limit) {
+    public List<PostResponse> getPosts(@RequestParam(defaultValue="0") int skip, @RequestParam(defaultValue = "30") int limit) {
         return this.postService.getPosts(skip, limit);
     }
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createPost(@RequestBody PostResponse postResponse) {
-        this.postService.createPost(postResponse);
+    public void createPost(@RequestHeader(value = HttpHeaders.AUTHORIZATION) String token, @RequestBody PostResponse postResponse) {
+        String tokenValue = token.replace("Bearer ", "").trim();
+        this.postService.createPost(tokenValue, postResponse);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Post updatePost(@PathVariable int id, @RequestBody Post post) {
-        return this.postService.updatePost(id, post);
+    public PostResponse updatePost(@RequestHeader(value = HttpHeaders.AUTHORIZATION) String token, @PathVariable int id, @RequestBody Post post) {
+        String tokenValue = token.replace("Bearer ", "").trim();
+        return this.postService.updatePost(tokenValue, id, post);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deletePost(@PathVariable int id) {
-        this.postService.deletePost(id);
+    public void deletePost(@RequestHeader(value = HttpHeaders.AUTHORIZATION) String token, @PathVariable int id) {
+        String tokenValue = token.replace("Bearer ", "").trim();
+        this.postService.deletePost(tokenValue, id);
     }
 
     @GetMapping("/{id}")
